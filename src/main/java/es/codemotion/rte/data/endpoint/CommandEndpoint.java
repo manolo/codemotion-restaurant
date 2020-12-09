@@ -1,8 +1,8 @@
 package es.codemotion.rte.data.endpoint;
 
 import es.codemotion.rte.data.CrudEndpoint;
-import es.codemotion.rte.data.entity.Person;
-import es.codemotion.rte.data.service.PersonService;
+import es.codemotion.rte.data.entity.Command;
+import es.codemotion.rte.data.service.CommandService;
 import com.vaadin.flow.server.connect.Endpoint;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,16 +11,16 @@ import java.time.LocalDate;
 import javax.annotation.Nullable;
 
 @Endpoint
-public class PersonEndpoint extends CrudEndpoint<Person, Integer> {
+public class CommandEndpoint extends CrudEndpoint<Command, Integer> {
 
-    private PersonService service;
+    private CommandService service;
 
-    public PersonEndpoint(@Autowired PersonService service) {
+    public CommandEndpoint(@Autowired CommandService service) {
         this.service = service;
     }
 
     @Override
-    protected PersonService getService() {
+    protected CommandService getService() {
         return service;
     }
 

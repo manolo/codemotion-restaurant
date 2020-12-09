@@ -13,11 +13,16 @@ import '@vaadin/vaadin-icons';
 import '@vaadin/vaadin-ordered-layout/vaadin-horizontal-layout';
 import '@vaadin/vaadin-split-layout/vaadin-split-layout';
 import '@vaadin/vaadin-text-field';
+import '@vaadin/vaadin-text-field/vaadin-integer-field';
 import '@vaadin/vaadin-upload';
+import '@vaadin/vaadin-combo-box';
+import '@vaadin/vaadin-time-picker';
+
 import { customElement, html, LitElement, property, query, unsafeCSS } from 'lit-element';
-import Person from '../../generated/es/codemotion/rte/data/entity/Person';
-import PersonModel from '../../generated/es/codemotion/rte/data/entity/PersonModel';
-import * as PersonEndpoint from '../../generated/PersonEndpoint';
+import Command from '../../generated/es/codemotion/rte/data/entity/Command';
+import CommandModel from '../../generated/es/codemotion/rte/data/entity/CommandModel';
+import * as CommandEndpoint from '../../generated/CommandEndpoint';
+// @ts-ignore
 import styles from './orders-view.css';
 
 @customElement('orders-view')
@@ -34,7 +39,7 @@ export class OrdersView extends LitElement {
 
   private gridDataProvider = this.getGridData.bind(this);
 
-  private binder = new Binder<Person, PersonModel>(this, PersonModel);
+  private binder = new Binder<Command, CommandModel>(this, CommandModel);
 
   render() {
     return html`
@@ -48,13 +53,12 @@ export class OrdersView extends LitElement {
             .dataProvider="${this.gridDataProvider}"
             @active-item-changed=${this.itemSelected}>
 
-            <vaadin-grid-sort-column path="firstName"></vaadin-grid-sort-column>
-            <vaadin-grid-sort-column path="lastName"></vaadin-grid-sort-column>
-            <vaadin-grid-sort-column path="email"></vaadin-grid-sort-column>
-            <vaadin-grid-sort-column path="phone"></vaadin-grid-sort-column>
-            <vaadin-grid-sort-column path="dateOfBirth"></vaadin-grid-sort-column>
-            <vaadin-grid-sort-column path="occupation"></vaadin-grid-sort-column>
-            <vaadin-grid-column path="important">
+            <vaadin-grid-sort-column path="tableNumber"></vaadin-grid-sort-column>
+            <vaadin-grid-sort-column path="type"></vaadin-grid-sort-column>
+            <vaadin-grid-sort-column path="description"></vaadin-grid-sort-column>
+            <vaadin-grid-sort-column path="quantity"></vaadin-grid-sort-column>
+            <vaadin-grid-sort-column path="hour"></vaadin-grid-sort-column>
+            <vaadin-grid-column path="served">
               <template>
                 <vaadin-checkbox checked="[[item.important]]" disabled></vaadin-checkbox>
               </template>
@@ -64,25 +68,25 @@ export class OrdersView extends LitElement {
         <div id="editor-layout">
           <div id="editor">
             <vaadin-form-layout>
-              <vaadin-text-field label="First name"
-                ...="${field(this.binder.model.firstName)}">
+              <vaadin-combo-box label="Table"
+                .items="${[1,2,3,4,5,6,7,8,9]}"
+                ...="${field(this.binder.model.tableNumber)}">
+              </vaadin-combo-box>
+              <vaadin-combo-box label="Type"
+                .items = "${['bebida', 'tapa', 'ración', 'plato', 'postre']}"
+                ...="${field(this.binder.model.type)}">
+              </vaadin-combo-box>
+              <vaadin-text-field  label="Description"
+                ...="${field(this.binder.model.description)}"></vaadin-text-field>
+              <vaadin-text-field label="Hour" readonly
+                ...="${field(this.binder.model.hour)}">
               </vaadin-text-field>
-              <vaadin-text-field label="Last name"
-                ...="${field(this.binder.model.lastName)}">
-              </vaadin-text-field>
-              <vaadin-text-field  label="Email"
-                ...="${field(this.binder.model.email)}"></vaadin-text-field>
-              <vaadin-text-field label="Phone"
-                ...="${field(this.binder.model.phone)}"></vaadin-text-field>
-              <vaadin-date-picker label="Date of birth"
-                ...="${field(this.binder.model.dateOfBirth)}">
-              </vaadin-date-picker>
-              <vaadin-text-field label="Occupation"
-                ...="${field(this.binder.model.occupation)}">
-              </vaadin-text-field>
+              <vaadin-integer-field label="Quantity"
+                ...="${field(this.binder.model.quantity)}">
+              </vaadin-integer-field>
               <vaadin-checkbox
-                ...="${field(this.binder.model.important)}">
-                Important
+                ...="${field(this.binder.model.served)}">
+                Served
               </vaadin-checkbox>
               </vaadin-form-layout>
           </div>
@@ -97,21 +101,21 @@ export class OrdersView extends LitElement {
 
   private async getGridData(params: GridDataProviderParams, callback: GridDataProviderCallback) {
     const index = params.page * params.pageSize;
-    const data = await PersonEndpoint.list(index, params.pageSize, params.sortOrders as any);
+    const data = await CommandEndpoint.list(index, params.pageSize, params.sortOrders as any);
     callback(data);
   }
 
   async connectedCallback() {
     super.connectedCallback();
-    this.gridSize = await PersonEndpoint.count();
+    this.gridSize = await CommandEndpoint.count();
   }
 
   private async itemSelected(event: CustomEvent) {
-    const item: Person = event.detail.value as Person;
+    const item: Command = event.detail.value as Command;
     this.grid.selectedItems = item ? [item] : [];
 
     if (item && item.id) {
-      const fromBackend = await PersonEndpoint.get(item.id);
+      const fromBackend = await CommandEndpoint.get(item.id);
       fromBackend ? this.binder.read(fromBackend) : this.refreshGrid();
     } else {
       this.clearForm();
@@ -120,7 +124,7 @@ export class OrdersView extends LitElement {
 
   private async save() {
     try {
-      await this.binder.submitTo(PersonEndpoint.update);
+      await this.binder.submitTo(CommandEndpoint.update);
 
       if (!this.binder.value.id) {
         // We added a new item
@@ -128,7 +132,7 @@ export class OrdersView extends LitElement {
       }
       this.clearForm();
       this.refreshGrid();
-      showNotification('Person details stored.', { position: 'bottom-start' });
+      showNotification('Command details stored.', { position: 'bottom-start' });
     } catch (error) {
       if (error instanceof EndpointError) {
         showNotification('Server error. ' + error.message, { position: 'bottom-start' });

@@ -1,6 +1,6 @@
 package es.codemotion.rte.data.service;
 
-import es.codemotion.rte.data.entity.Person;
+import es.codemotion.rte.data.entity.Command;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,11 +10,11 @@ import java.time.LocalDate;
 import javax.annotation.Nullable;
 
 @Service
-public class PersonService extends CrudService<Person, Integer> {
+public class CommandService extends CrudService<Command, Integer> {
 
     private PersonRepository repository;
 
-    public PersonService(@Autowired PersonRepository repository) {
+    public CommandService(@Autowired PersonRepository repository) {
         this.repository = repository;
     }
 
