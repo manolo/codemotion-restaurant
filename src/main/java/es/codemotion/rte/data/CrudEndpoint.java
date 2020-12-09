@@ -3,6 +3,7 @@ package es.codemotion.rte.data;
 import java.util.List;
 import java.util.Optional;
 
+import com.vaadin.flow.server.connect.Deferrable;
 import com.vaadin.flow.server.connect.EndpointExposed;
 import com.vaadin.flow.server.connect.auth.AnonymousAllowed;
 
@@ -27,6 +28,7 @@ public abstract class CrudEndpoint<T, ID> {
         return getService().get(id);
     }
 
+    @Deferrable
     public T update(T entity) {
         return getService().update(entity);
     }
