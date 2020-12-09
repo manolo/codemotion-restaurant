@@ -17,9 +17,9 @@ const routes = [
     children: [
       {
         path: '',
-        component: 'about-view',
+        component: 'orders-view',
         action: async () => {
-          await import('./views/about/about-view');
+          await import('./views/orders/orders-view');
         },
       },
       {
@@ -27,13 +27,6 @@ const routes = [
         component: 'about-view',
         action: async () => {
           await import('./views/about/about-view');
-        },
-      },
-      {
-        path: 'orders',
-        component: 'orders-view',
-        action: async () => {
-          await import('./views/orders/orders-view');
         },
       },
       // for server-side, the next magic line sends all unmatched routes:

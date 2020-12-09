@@ -18,7 +18,6 @@ import { customElement, html, LitElement, property, query, unsafeCSS } from 'lit
 import Person from '../../generated/es/codemotion/rte/data/entity/Person';
 import PersonModel from '../../generated/es/codemotion/rte/data/entity/PersonModel';
 import * as PersonEndpoint from '../../generated/PersonEndpoint';
-// @ts-ignore
 import styles from './orders-view.css';
 
 @customElement('orders-view')
@@ -35,7 +34,7 @@ export class OrdersView extends LitElement {
 
   private gridDataProvider = this.getGridData.bind(this);
 
-  private binder = new Binder<any, any>(this, PersonModel);
+  private binder = new Binder<Person, PersonModel>(this, PersonModel);
 
   render() {
     return html`
@@ -47,67 +46,49 @@ export class OrdersView extends LitElement {
             theme="no-border"
             .size="${this.gridSize}"
             .dataProvider="${this.gridDataProvider}"
-            @active-item-changed=${this.itemSelected}
-          >
-            <vaadin-grid-sort-column auto-width path="firstName"></vaadin-grid-sort-column
-            ><vaadin-grid-sort-column auto-width path="lastName"></vaadin-grid-sort-column
-            ><vaadin-grid-sort-column auto-width path="email"></vaadin-grid-sort-column
-            ><vaadin-grid-sort-column auto-width path="phone"></vaadin-grid-sort-column
-            ><vaadin-grid-sort-column auto-width path="dateOfBirth"></vaadin-grid-sort-column
-            ><vaadin-grid-sort-column auto-width path="occupation"></vaadin-grid-sort-column
-            ><vaadin-grid-column auto-width path="important"
-              ><template
-                ><iron-icon
-                  hidden="[[!item.important]]"
-                  icon="vaadin:check"
-                  style="width: var(--lumo-icon-size-s); height: var(--lumo-icon-size-s); color: var(--lumo-primary-text-color);"
-                >
-                </iron-icon>
-                <iron-icon
-                  hidden="[[item.important]]"
-                  icon="vaadin:minus"
-                  style="width: var(--lumo-icon-size-s); height: var(--lumo-icon-size-s); color: var(--lumo-disabled-text-color);"
-                >
-                </iron-icon></template
-            ></vaadin-grid-column>
+            @active-item-changed=${this.itemSelected}>
+
+            <vaadin-grid-sort-column path="firstName"></vaadin-grid-sort-column>
+            <vaadin-grid-sort-column path="lastName"></vaadin-grid-sort-column>
+            <vaadin-grid-sort-column path="email"></vaadin-grid-sort-column>
+            <vaadin-grid-sort-column path="phone"></vaadin-grid-sort-column>
+            <vaadin-grid-sort-column path="dateOfBirth"></vaadin-grid-sort-column>
+            <vaadin-grid-sort-column path="occupation"></vaadin-grid-sort-column>
+            <vaadin-grid-column path="important">
+              <template>
+                <vaadin-checkbox checked="[[item.important]]" disabled></vaadin-checkbox>
+              </template>
+            </vaadin-grid-column>
           </vaadin-grid>
         </div>
         <div id="editor-layout">
           <div id="editor">
-            <vaadin-form-layout
-              ><vaadin-text-field
-                label="First name"
-                id="firstName"
-                ...="${field(this.binder.model.firstName)}"
-              ></vaadin-text-field
-              ><vaadin-text-field
-                label="Last name"
-                id="lastName"
-                ...="${field(this.binder.model.lastName)}"
-              ></vaadin-text-field
-              ><vaadin-text-field label="Email" id="email" ...="${field(this.binder.model.email)}"></vaadin-text-field
-              ><vaadin-text-field label="Phone" id="phone" ...="${field(this.binder.model.phone)}"></vaadin-text-field
-              ><vaadin-date-picker
-                label="Date of birth"
-                id="dateOfBirth"
-                ...="${field(this.binder.model.dateOfBirth)}"
-              ></vaadin-date-picker
-              ><vaadin-text-field
-                label="Occupation"
-                id="occupation"
-                ...="${field(this.binder.model.occupation)}"
-              ></vaadin-text-field
-              ><vaadin-checkbox
-                id="important"
-                ...="${field(this.binder.model.important)}"
-                style="padding-top: var(--lumo-space-m);"
-                >Important</vaadin-checkbox
-              ></vaadin-form-layout
-            >
+            <vaadin-form-layout>
+              <vaadin-text-field label="First name"
+                ...="${field(this.binder.model.firstName)}">
+              </vaadin-text-field>
+              <vaadin-text-field label="Last name"
+                ...="${field(this.binder.model.lastName)}">
+              </vaadin-text-field>
+              <vaadin-text-field  label="Email"
+                ...="${field(this.binder.model.email)}"></vaadin-text-field>
+              <vaadin-text-field label="Phone"
+                ...="${field(this.binder.model.phone)}"></vaadin-text-field>
+              <vaadin-date-picker label="Date of birth"
+                ...="${field(this.binder.model.dateOfBirth)}">
+              </vaadin-date-picker>
+              <vaadin-text-field label="Occupation"
+                ...="${field(this.binder.model.occupation)}">
+              </vaadin-text-field>
+              <vaadin-checkbox
+                ...="${field(this.binder.model.important)}">
+                Important
+              </vaadin-checkbox>
+              </vaadin-form-layout>
           </div>
           <vaadin-horizontal-layout id="button-layout" theme="spacing">
             <vaadin-button theme="primary" @click="${this.save}">Save</vaadin-button>
-            <vaadin-button theme="tertiary" @click="${this.cancel}">Cancel</vaadin-button>
+            <vaadin-button theme="tertiary" @click="${this.cancel}">New</vaadin-button>
           </vaadin-horizontal-layout>
         </div>
       </vaadin-split-layout>
@@ -129,7 +110,7 @@ export class OrdersView extends LitElement {
     const item: Person = event.detail.value as Person;
     this.grid.selectedItems = item ? [item] : [];
 
-    if (item) {
+    if (item && item.id) {
       const fromBackend = await PersonEndpoint.get(item.id);
       fromBackend ? this.binder.read(fromBackend) : this.refreshGrid();
     } else {

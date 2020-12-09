@@ -20,6 +20,7 @@ import com.vaadin.flow.theme.lumo.Lumo;
 @Theme(value = Lumo.class, variant = Lumo.DARK)
 @PWA(name = "restaurant", shortName = "restaurant")
 public class Application extends SpringBootServletInitializer implements AppShellConfigurator {
+    private static final long serialVersionUID = 1L;
 
     public static void main(String[] args) {
         LaunchUtil.launchBrowserInDevelopmentMode(SpringApplication.run(Application.class, args));

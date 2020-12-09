@@ -20,7 +20,7 @@ export class MainView extends LitElement {
 
   @property({ type: Array }) menuTabs: MenuTab[] = [
     { route: 'about', name: 'About' },
-    { route: 'orders', name: 'Orders' },
+    { route: '', name: 'Orders' },
   ];
 
   @property({ type: String }) projectName = '';
